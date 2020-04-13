@@ -1,0 +1,48 @@
+import residual_shared_autonomy.lunar_lander
+import residual_shared_autonomy.imitation_learning
+
+train.algorithm = @TD3
+train.maxt = 1000000
+train.seed = 0
+train.eval = True
+train.eval_period = 100000
+train.save_period = 100000
+train.maxseconds = None
+
+TD3.env_fn = @make_env
+TD3.policy_fn = @lunar_lander_policy_fn
+TD3.qf_fn = @lunar_lander_qf_fn
+TD3.nenv = 1
+TD3.eval_num_episodes = 20
+TD3.gpu = True
+TD3.record_num_episodes = 5
+TD3.buffer_size = 100000
+TD3.frame_stack = 1
+TD3.learning_starts = 10000
+TD3.update_period = 1
+TD3.env_fn = @make_env
+TD3.optimizer = @optim.Adam
+TD3.batch_size = 256
+TD3.lr = 3e-4
+TD3.gamma = 0.99
+TD3.exploration_noise = 0.1
+TD3.policy_noise = 0.2
+TD3.policy_noise_clip = 0.5
+TD3.policy_update_period = 2
+TD3.target_smoothing_coef = 0.005
+TD3.reward_scale = 1
+TD3.log_period = 100
+
+Checkpointer.ckpt_period = 100000
+
+optim.Adam.betas = (0.9, 0.999)
+
+make_env.env_id = "LunarLanderRandomContinuous-v2"
+make_env.norm_observations = True
+
+VecObsNormWrapper.steps = 10000
+VecObsNormWrapper.mean = @bc_mean()
+VecObsNormWrapper.std = @bc_std()
+VecObsNormWrapper.eps = 1e-2
+VecObsNormWrapper.log = True
+VecObsNormWrapper.log_prob = 0.01

@@ -1,0 +1,46 @@
+import residual_shared_autonomy.drone_sim
+import residual_shared_autonomy.imitation_learning
+
+train.algorithm = @PPO
+train.maxt = 20000000
+train.seed = 0
+train.eval = True
+train.eval_period = 1000000
+train.save_period = 1000000
+train.maxseconds = None
+
+optim.Adam.lr = 0.001
+optim.Adam.betas = (0.9, 0.999)
+optim.Adam.eps = 1e-5
+
+PPO.env_fn = @make_env
+PPO.policy_fn = @drone_ppo_policy_fn
+PPO.nenv = 64
+PPO.eval_num_episodes = 100
+PPO.record_num_episodes = 0
+PPO.rollout_length = 1024
+PPO.batch_size = 512
+PPO.gamma = 0.99
+PPO.lambda_ = 0.95
+PPO.norm_advantages = True
+PPO.optimizer = @optim.Adam
+PPO.clip_param = 0.2
+PPO.epochs_per_rollout = 4
+PPO.max_grad_norm = 0.5
+PPO.ent_coef = 0.01
+PPO.vf_coef = 0.5
+PPO.gpu = True
+
+Checkpointer.ckpt_period = 1000000
+
+make_env.env_id = "DroneReacherBot-v0"
+make_env.norm_observations = True
+
+DiagGaussian.constant_log_std = False
+
+VecObsNormWrapper.steps = 10000
+VecObsNormWrapper.mean = @drone_bc_mean()
+VecObsNormWrapper.std = @drone_bc_std()
+VecObsNormWrapper.eps = 1e-2
+VecObsNormWrapper.log = True
+VecObsNormWrapper.log_prob = 0.01

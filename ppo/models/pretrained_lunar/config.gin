@@ -1,0 +1,109 @@
+import residual_shared_autonomy.lunar_lander
+import residual_shared_autonomy.imitation_learning
+import residual_shared_autonomy.ppo
+
+# Parameters for Adam:
+# ==============================================================================
+Adam.amsgrad = False
+Adam.betas = (0.9, 0.999)
+Adam.eps = 1e-05
+Adam.lr = 0.001
+Adam.weight_decay = 0
+
+# Parameters for bc_mean:
+# ==============================================================================
+# None.
+
+# Parameters for bc_std:
+# ==============================================================================
+# None.
+
+# Parameters for BCMultiActor:
+# ==============================================================================
+BCMultiActor.device = 'cuda:0'
+BCMultiActor.logdir = \
+    '/home-nfs/cbschaff/projects/residual_shared_autonomy/ppo/bc_agents_no_terrain'
+BCMultiActor.switch_prob = 0.001
+
+# Parameters for BCNet:
+# ==============================================================================
+BCNet.action_shape = 2
+BCNet.nunits = 128
+BCNet.ob_shape = 9
+
+# Parameters for Checkpointer:
+# ==============================================================================
+Checkpointer.ckpt_period = 100000
+Checkpointer.format = '{:09d}'
+
+# Parameters for ConstrainedResidualPPO:
+# ==============================================================================
+ConstrainedResidualPPO.base_actor_cls = @BCMultiActor
+ConstrainedResidualPPO.batch_size = 256
+ConstrainedResidualPPO.clip_param = 0.2
+ConstrainedResidualPPO.ent_coef = 0.01
+ConstrainedResidualPPO.env_fn = @make_env
+ConstrainedResidualPPO.epochs_per_rollout = 4
+ConstrainedResidualPPO.eval_num_episodes = 100
+ConstrainedResidualPPO.gamma = 0.99
+ConstrainedResidualPPO.gpu = True
+ConstrainedResidualPPO.l2_reg = False
+ConstrainedResidualPPO.lambda_ = 0.95
+ConstrainedResidualPPO.lambda_init = 20.0
+ConstrainedResidualPPO.lambda_lr = 0.003
+ConstrainedResidualPPO.lambda_training_start = 2000000
+ConstrainedResidualPPO.lr_decay_freq = 20000000
+ConstrainedResidualPPO.lr_decay_rate = 0.31622776601
+ConstrainedResidualPPO.max_grad_norm = 0.5
+ConstrainedResidualPPO.nenv = 32
+ConstrainedResidualPPO.norm_advantages = True
+ConstrainedResidualPPO.optimizer = @optim.Adam
+ConstrainedResidualPPO.policy_fn = @ppo_policy_fn
+ConstrainedResidualPPO.policy_training_start = 100000
+ConstrainedResidualPPO.record_num_episodes = 5
+ConstrainedResidualPPO.reward_threshold = -155.0
+ConstrainedResidualPPO.vf_coef = 0.5
+ConstrainedResidualPPO.wrapper_fn = @lunar_lander_fuel_wrapper
+
+# Parameters for DiagGaussian:
+# ==============================================================================
+DiagGaussian.constant_log_std = False
+DiagGaussian.log_std_max = 2
+DiagGaussian.log_std_min = -20
+
+# Parameters for lunar_lander_fuel_wrapper:
+# ==============================================================================
+# None.
+
+# Parameters for make_env:
+# ==============================================================================
+make_env.env_id = 'LunarLanderRandomContinuousNoGoal-v2'
+make_env.norm_observations = True
+make_env.seed = 0
+
+# Parameters for Policy:
+# ==============================================================================
+# None.
+
+# Parameters for ppo_policy_fn:
+# ==============================================================================
+ppo_policy_fn.nunits = 128
+
+# Parameters for train:
+# ==============================================================================
+train.algorithm = @ConstrainedResidualPPO
+train.eval = True
+train.eval_period = 1000000
+train.maxseconds = None
+train.maxt = 100000000
+train.save_period = 1000000
+train.seed = 0
+
+# Parameters for VecObsNormWrapper:
+# ==============================================================================
+VecObsNormWrapper.eps = 0.01
+VecObsNormWrapper.log = True
+VecObsNormWrapper.log_prob = 0.01
+VecObsNormWrapper.mean = @bc_mean()
+VecObsNormWrapper.std = @bc_std()
+VecObsNormWrapper.steps = 10000

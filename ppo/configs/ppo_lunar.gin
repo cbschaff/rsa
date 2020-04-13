@@ -1,0 +1,68 @@
+import residual_shared_autonomy.ppo
+import residual_shared_autonomy.imitation_learning
+import residual_shared_autonomy.lunar_lander
+
+train.algorithm = @ConstrainedResidualPPO
+train.maxt = 100000000
+train.seed = 0
+train.eval = True
+train.eval_period = 1000000
+train.save_period = 1000000
+train.maxseconds = None
+
+optim.Adam.lr = 0.001
+optim.Adam.betas = (0.9, 0.999)
+optim.Adam.eps = 1e-5
+
+ConstrainedResidualPPO.policy_training_start = 100000
+ConstrainedResidualPPO.lambda_training_start = 2000000
+ConstrainedResidualPPO.lambda_lr = 0.003
+ConstrainedResidualPPO.lambda_init = 20
+ConstrainedResidualPPO.lr_decay_rate = 0.31622776601
+ConstrainedResidualPPO.lr_decay_freq = 20000000
+ConstrainedResidualPPO.l2_reg = False
+ConstrainedResidualPPO.reward_threshold = -155
+ConstrainedResidualPPO.env_fn = @make_env
+ConstrainedResidualPPO.policy_fn = @ppo_policy_fn
+ConstrainedResidualPPO.nenv = 32
+ConstrainedResidualPPO.eval_num_episodes = 100
+ConstrainedResidualPPO.record_num_episodes = 0
+ConstrainedResidualPPO.rollout_length = 1024
+ConstrainedResidualPPO.batch_size = 256
+ConstrainedResidualPPO.gamma = 0.99
+ConstrainedResidualPPO.lambda_ = 0.95
+ConstrainedResidualPPO.norm_advantages = True
+ConstrainedResidualPPO.optimizer = @optim.Adam
+ConstrainedResidualPPO.clip_param = 0.2
+ConstrainedResidualPPO.epochs_per_rollout = 4
+ConstrainedResidualPPO.max_grad_norm = 0.5
+ConstrainedResidualPPO.ent_coef = 0.01
+ConstrainedResidualPPO.vf_coef = 0.5
+ConstrainedResidualPPO.gpu = True
+ConstrainedResidualPPO.base_actor_cls = @BCMultiActor
+ConstrainedResidualPPO.wrapper_fn = @lunar_lander_fuel_wrapper
+
+BCMultiActor.logdir = "./models/behavioral_cloning_agents_lunar"
+BCMultiActor.device = "cuda:0"
+BCMultiActor.switch_prob = 0.001
+
+BCNet.ob_shape = 9
+BCNet.action_shape = 2
+BCNet.nunits = 128
+
+
+Checkpointer.ckpt_period = 100000
+
+make_env.env_id = "LunarLanderRandomContinuousNoGoal-v2"
+make_env.norm_observations = True
+
+VecObsNormWrapper.steps = 10000
+VecObsNormWrapper.mean = @bc_mean()
+VecObsNormWrapper.std = @bc_std()
+VecObsNormWrapper.eps = 1e-2
+VecObsNormWrapper.log = True
+VecObsNormWrapper.log_prob = 0.01
+
+# Model Params
+ppo_policy_fn.nunits = 128
+DiagGaussian.constant_log_std = False
