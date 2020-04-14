@@ -19,7 +19,7 @@ OpenAI Gym, gin-config, and Tensorboard.
     ```./build_docker.sh```
 4. Launch the docker container by running:
     ```./launch_docker.sh```
-    This will start a container and mount the code at ```/root/pkgs/residual_policy_learning```.
+    This will start a container and mount the code at ```/root/pkgs/residual_shared_autonomy```.
  
  All commands, unless otherwise stated, should be run from inside a docker container.
  
